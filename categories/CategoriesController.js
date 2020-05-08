@@ -17,10 +17,9 @@ router.post('/categories/save', (req, res) => {
         Category.create({
             title,
             slug: slugify(title)
+        }).then(() => {
+            res.redirect('/admin/categories');
         })
-            .then(() => {
-                res.redirect('/');
-            })
     } else {
         res.redirect('/admin/categories/new');
     }
@@ -45,6 +44,34 @@ router.post('/categories/delete', (req, res) => {
     } else {
         res.redirect('/admin/categories');
     }
+});
+
+router.get('/admin/categories/edit/:id', (req, res) => {
+    const id = req.params.id;
+
+    if (isNaN(id)) {
+        res.redirect('/admin/categories');
+    }
+
+    Category.findByPk(id)
+        .then(category => {
+            if (category) {
+                res.render('admin/categories/edit', { category });
+            } else {
+                res.redirect('/admin/categories');
+            }
+        })
+        .catch(erro => {
+            res.redirect('/admin/categories');
+        });
+});
+
+router.post('/categories/update', (req, res) => {
+    let { id, title } = req.body;
+    Category.update({ title, slug: slugify(title) }, { where: { id } })
+        .then(() => {
+            res.redirect('/admin/categories');
+        });
 });
 
 module.exports = router;
