@@ -26,9 +26,23 @@ app.use('/', categoriesController);
 app.use('/', articlesController);
 
 app.get('/', (req, res) => {
-    Article.findAll()
+    Article.findAll({ order: [['id', 'DESC']] })
         .then(articles => {
             res.render('index', { articles });
+        });
+});
+
+app.get('/:slug', (req, res) => {
+    const slug = req.params.slug;
+    Article.findOne({ where: { slug } })
+        .then(article => {
+            if (article) {
+                res.render('article', { article });
+            } else {
+                res.redirect('/');
+            }
+        }).catch(erro => {
+            res.redirect('/');
         });
 });
 
