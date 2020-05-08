@@ -34,8 +34,6 @@ router.get('/admin/categories', (req, res) => {
 
 router.post('/categories/delete', (req, res) => {
     const { id } = req.body;
-    console.log(id);
-    console.log(isNaN(id));
     if (id !== undefined && !isNaN(id)) {
         Category.destroy({ where: { id } })
             .then(() => {
