@@ -75,4 +75,37 @@ router.post('/articles/update', (req, res) => {
     })
 });
 
+router.get('/articles/page/:num', (req, res) => {
+    let page = req.params.num;
+    const limit = 4;
+    let offset = 0;
+    if (isNaN(page) || page <= 1) {
+        page = 0;
+        offset = 0;
+    } else {
+        page = parseInt(page);
+        if (page > 0) {
+            page -= 1;
+        }
+        offset = page * limit;
+    }
+
+    Article.findAndCountAll({ order: [['id', 'DESC']], limit, offset })
+        .then(articles => {
+            let next = true;
+            if (offset + limit >= articles.count) {
+                next = false;
+            }
+            let result = {
+                page: page + 1,
+                next,
+                articles
+            };
+            Category.findAll()
+                .then(categories => {
+                    res.render('admin/articles/page', { result, categories });
+                });
+        });
+});
+
 module.exports = router;
